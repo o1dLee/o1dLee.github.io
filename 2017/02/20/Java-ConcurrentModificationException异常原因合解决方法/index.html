@@ -8,19 +8,16 @@
   <link rel="dns-prefetch" href="http://yoursite.com">
   <title>Java ConcurrentModificationException异常原因合解决方法 | oldlee的个人博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="一.异常原因在迭代一个ArrayList或HashMap时，如果尝试对其进行修改操作，则会抛出该异常！ 注意这里总共有两个操作：遍历-修改，搞懂这两个操作里面都做了哪些事情也就弄明白了这个异常产生的 原因。
-12345678910111213141516public boolean remove(Object o) &amp;#123;        if (o == null) &amp;#123;">
+  <meta name="description" content="一.异常原因在迭代一个ArrayList或HashMap时，如果尝试对其进行修改操作，则会抛出该异常！ 注意这里总共有两个操作：遍历-修改，搞懂这两个操作里面都做了哪些事情也就弄明白了这个异常产生的 原因。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Java ConcurrentModificationException异常原因合解决方法">
 <meta property="og:url" content="http://yoursite.com/2017/02/20/Java-ConcurrentModificationException异常原因合解决方法/index.html">
 <meta property="og:site_name" content="oldlee的个人博客">
-<meta property="og:description" content="一.异常原因在迭代一个ArrayList或HashMap时，如果尝试对其进行修改操作，则会抛出该异常！ 注意这里总共有两个操作：遍历-修改，搞懂这两个操作里面都做了哪些事情也就弄明白了这个异常产生的 原因。
-12345678910111213141516public boolean remove(Object o) &amp;#123;        if (o == null) &amp;#123;">
-<meta property="og:updated_time" content="2017-02-21T07:30:36.000Z">
+<meta property="og:description" content="一.异常原因在迭代一个ArrayList或HashMap时，如果尝试对其进行修改操作，则会抛出该异常！ 注意这里总共有两个操作：遍历-修改，搞懂这两个操作里面都做了哪些事情也就弄明白了这个异常产生的 原因。">
+<meta property="og:updated_time" content="2017-02-21T07:32:16.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Java ConcurrentModificationException异常原因合解决方法">
-<meta name="twitter:description" content="一.异常原因在迭代一个ArrayList或HashMap时，如果尝试对其进行修改操作，则会抛出该异常！ 注意这里总共有两个操作：遍历-修改，搞懂这两个操作里面都做了哪些事情也就弄明白了这个异常产生的 原因。
-12345678910111213141516public boolean remove(Object o) &amp;#123;        if (o == null) &amp;#123;">
+<meta name="twitter:description" content="一.异常原因在迭代一个ArrayList或HashMap时，如果尝试对其进行修改操作，则会抛出该异常！ 注意这里总共有两个操作：遍历-修改，搞懂这两个操作里面都做了哪些事情也就弄明白了这个异常产生的 原因。">
   
     <link rel="alternative" href="/atom.xml" title="oldlee的个人博客" type="application/atom+xml">
   
@@ -162,7 +159,7 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h2 id="一-异常原因"><a href="#一-异常原因" class="headerlink" title="一.异常原因"></a>一.异常原因</h2><p><strong>在迭代一个ArrayList或HashMap时，如果尝试对其进行修改操作，则会抛出该异常！</strong> 注意这里总共有两个操作：<em>遍历</em>-<em>修改</em>，搞懂这两个操作里面都做了哪些事情也就弄明白了这个异常产生的 原因。</p>
+        <h2 id="一-异常原因"><a href="#一-异常原因" class="headerlink" title="一.异常原因"></a>一.异常原因</h2><p><strong>在迭代一个ArrayList或HashMap时，如果尝试对其进行修改操作，则会抛出该异常！</strong> 注意这里总共有两个操作：<em>遍历</em>-<em>修改</em>，搞懂这两个操作里面都做了哪些事情也就弄明白了这个异常产生的 原因。<br><a id="more"></a></p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">remove</span><span class="params">(Object o)</span> </span>&#123;</div><div class="line">        <span class="keyword">if</span> (o == <span class="keyword">null</span>) &#123;</div><div class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> index = <span class="number">0</span>; index &lt; size; index++)</div><div class="line">                <span class="keyword">if</span> (elementData[index] == <span class="keyword">null</span>) &#123;</div><div class="line">                    fastRemove(index);</div><div class="line">                    <span class="keyword">return</span> <span class="keyword">true</span>;</div><div class="line">                &#125;</div><div class="line">        &#125; <span class="keyword">else</span> &#123;</div><div class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> index = <span class="number">0</span>; index &lt; size; index++)</div><div class="line">                <span class="keyword">if</span> (o.equals(elementData[index])) &#123;</div><div class="line">                    fastRemove(index);         <span class="comment">//这里是关键的操作</span></div><div class="line">                    <span class="keyword">return</span> <span class="keyword">true</span>;</div><div class="line">                &#125;</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
 <p>看下remove的操作，其中特殊的地方在fastRemove()方法中，看下fastRemove()做了什么操作：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">fastRemove</span><span class="params">(<span class="keyword">int</span> index)</span> </span>&#123;</div><div class="line">        modCount++;        <span class="comment">//关键点</span></div><div class="line">        <span class="keyword">int</span> numMoved = size - index - <span class="number">1</span>;</div><div class="line">        <span class="keyword">if</span> (numMoved &gt; <span class="number">0</span>)</div><div class="line">            System.arraycopy(elementData, index+<span class="number">1</span>, elementData, index,</div><div class="line">                             numMoved);</div><div class="line">        elementData[--size] = <span class="keyword">null</span>; <span class="comment">// clear to let GC do its work</span></div><div class="line">    &#125;</div></pre></td></tr></table></figure></p>
 <p>每次操作都会对modCount进行加1操作，那么modCount是什么呢？看下JDK的注释代码：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line">     * The number of times this list has been &lt;i&gt;structurally modified&lt;/i&gt;.</div><div class="line">     * Structural modifications are those that change the size of the</div><div class="line">     * list, or otherwise perturb it in such a fashion that iterations in</div><div class="line">     * progress may yield incorrect results.</div><div class="line">     *</div><div class="line">     * &lt;p&gt;This field is used by the iterator and list iterator implementation</div><div class="line">     * returned by the &#123;<span class="doctag">@code</span> iterator&#125; and &#123;<span class="doctag">@code</span> listIterator&#125; methods.</div><div class="line">     * If the value of this field changes unexpectedly, the iterator (or list</div><div class="line">     * iterator) will throw a &#123;<span class="doctag">@code</span> ConcurrentModificationException&#125; in</div><div class="line">     * response to the &#123;<span class="doctag">@code</span> next&#125;, &#123;<span class="doctag">@code</span> remove&#125;, &#123;<span class="doctag">@code</span> previous&#125;,</div><div class="line">     * &#123;<span class="doctag">@code</span> set&#125; or &#123;<span class="doctag">@code</span> add&#125; operations.  This provides</div><div class="line">     * &lt;i&gt;fail-fast&lt;/i&gt; behavior, rather than non-deterministic behavior in</div><div class="line">     * the face of concurrent modification during iteration.</div><div class="line">     *</div><div class="line">     * &lt;p&gt;&lt;b&gt;Use of this field by subclasses is optional.&lt;/b&gt; If a subclass</div><div class="line">     * wishes to provide fail-fast iterators (and list iterators), then it</div><div class="line">     * merely has to increment this field in its &#123;<span class="doctag">@code</span> add(int, E)&#125; and</div><div class="line">     * &#123;<span class="doctag">@code</span> remove(int)&#125; methods (and any other methods that it overrides</div><div class="line">     * that result in structural modifications to the list).  A single call to</div><div class="line">     * &#123;<span class="doctag">@code</span> add(int, E)&#125; or &#123;<span class="doctag">@code</span> remove(int)&#125; must add no more than</div><div class="line">     * one to this field, or the iterators (and list iterators) will throw</div><div class="line">     * bogus &#123;<span class="doctag">@code</span> ConcurrentModificationExceptions&#125;.  If an implementation</div><div class="line">     * does not wish to provide fail-fast iterators, this field may be</div><div class="line">     * ignored.</div><div class="line">     */</div><div class="line">    <span class="keyword">protected</span> <span class="keyword">transient</span> <span class="keyword">int</span> modCount = <span class="number">0</span>;</div></pre></td></tr></table></figure></p>
@@ -192,15 +189,15 @@
         		</li>
       		 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">集合</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
         			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">多线程</a>
         		</li>
       		 
         		<li class="article-tag-list-item">
         			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">编程</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">集合</a>
         		</li>
       		
 		</ul>
@@ -426,11 +423,11 @@ var _hmt = _hmt || [];
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">集合</a>
+                <a href="javascript:void(0)" class="js-tag color4">多线程</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">多线程</a>
+                <a href="javascript:void(0)" class="js-tag color4">线程池</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -438,7 +435,7 @@ var _hmt = _hmt || [];
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">线程池</a>
+                <a href="javascript:void(0)" class="js-tag color3">集合</a>
               </li>
             
             <div class="clearfix"></div>
